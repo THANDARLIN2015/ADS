@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V2BOX VPN - Secure Connection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #2c3e50, #4ca1af);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo i {
+            margin-right: 15px;
+            color: #fdbb2d;
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .connection-status {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        
+        .connected {
+            background: #4CAF50;
+            padding: 8px 15px;
+            border-radius: 15px;
+        }
+        
+        .disconnected {
+            background: #f44336;
+            padding: 8px 15px;
+            border-radius: 15px;
+        }
+        
+        .connecting {
+            background: #FF9800;
+            padding: 8px 15px;
+            border-radius: 15px;
+        }
+        
+        .main-content {
+            display: flex;
+            padding: 20px;
+            min-height: 400px;
+        }
+        
+        .left-panel {
+            flex: 3;
+            padding: 20px;
+        }
+        
+        .right-panel {
+            flex: 2;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 10px;
+            margin-left: 20px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .server-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .connection-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .btn-connect {
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .btn-disconnect {
+            background: linear-gradient(90deg, #f44336, #c62828);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .import-area {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 10px;
+            color: #4ca1af;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px dashed #4ca1af;
+            border-radius: 8px;
+            resize: none;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .ad-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .ad-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .banner-ad {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .rewarded-ad {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(90deg, #fdbb2d, #b21f1f);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            font-size: 0.9rem;
+        }
+        
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #000;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .vpn-indicator {
+            display: flex;
+            align-items: center;
+        }
+        
+        .vpn-indicator i {
+            margin-right: 5px;
+            color: #4CAF50;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 30px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .notification.connected {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .notification.disconnected {
+            border-left: 4px solid #f44336;
+        }
+        
+        .speed-test {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .speed-result {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+        
+        .speed-label {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        
+        .latency-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .latency-table th, .latency-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .latency-table th {
+            background: #f5f7fa;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .right-panel {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar" id="statusBar">
+        <div id="currentTime">12:34 PM</div>
+        <div class="vpn-indicator" id="vpnIndicator" style="display: none;">
+            <i class="fas fa-lock"></i> V2BOX VPN
+        </div>
+        <div>
+            <i class="fas fa-wifi"></i> 100% <i class="fas fa-battery-full"></i>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span id="notificationText">VPN Connected Successfully</span>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>V2BOX VPN</span>
+            </div>
+            <div class="tagline">Secure and Fast VPN Connection</div>
+            <div class="connection-status">
+                Status: <span class="disconnected" id="statusText">Disconnected</span>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="connection-buttons">
+                    <button class="btn btn-connect" id="connectBtn">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                    <button class="btn btn-disconnect" id="disconnectBtn" disabled>
+                        <i class="fas fa-power-off"></i> Disconnect
+                    </button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Bytes In</div>
+                        <div class="stat-value" id="bytesIn">0 KB</div>
+                        <div class="stat-label">Total Received</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Bytes Out</div>
+                        <div class="stat-value" id="bytesOut">0 KB</div>
+                        <div class="stat-label">Total Sent</div>
+                    </div>
+                </div>
+                
+                <div class="server-info">
+                    <h2><i class="fas fa-server"></i> Server Information</h2>
+                    <div class="info-item">
+                        <span>Location:</span>
+                        <span id="serverLocation">Not connected</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Ping:</span>
+                        <span id="serverPing">N/A</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Status:</span>
+                        <span id="serverStatus">Inactive</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Protocol:</span>
+                        <span id="serverProtocol">None</span>
+                    </div>
+                    <div class="info-item">
+                        <span>IP Address:</span>
+                        <span id="serverIP">0.0.0.0</span>
+                    </div>
+                </div>
+                
+                <div class="speed-test">
+                    <h2><i class="fas fa-tachometer-alt"></i> Speed Test</h2>
+                    <button class="btn" id="speedTestBtn">
+                        <i class="fas fa-play"></i> Test Connection Speed
+                    </button>
+                    <div class="speed-result" id="speedResult">-</div>
+                    <div class="speed-label">Download Speed</div>
+                    
+                    <table class="latency-table">
+                        <tr>
+                            <th>Latency</th>
+                            <th>Unloaded</th>
+                            <th>Loaded</th>
+                        </tr>
+                        <tr>
+                            <td>Time</td>
+                            <td id="unloadedLatency">-</td>
+                            <td id="loadedLatency">-</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="info-item">
+                        <span>Upload Speed:</span>
+                        <span id="uploadSpeed">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="import-area">
+                    <h2><i class="fas fa-file-import"></i> Import Configuration</h2>
+                    <textarea id="configInput" placeholder="Paste your configuration here or import from file">vless://5d9a2e3d-87d1-4c34-b5f2-1e2c3d4e5f6f@thailand.server.v2box.com:443?security=tls&type=ws&path=%2Fv2box#Thailand-Server</textarea>
+                    <div class="connection-buttons">
+                        <button class="btn" onclick="importFromClipboard()">
+                            <i class="fas fa-clipboard"></i> Import from Clipboard
+                        </button>
+                        <button class="btn" onclick="importFromFile()">
+                            <i class="fas fa-file-upload"></i> Import from File
+                        </button>
+                    </div>
+                    <div class="connection-buttons">
+                        <button class="btn" onclick="saveConfig()">
+                            <i class="fas fa-save"></i> Save Configuration
+                        </button>
+                        <button class="btn" onclick="clearConfig()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="ad-container">
+                    <div class="ad-label">Advertisement</div>
+                    <div class="banner-ad">
+                        <h3>Banner Ad Space</h3>
+                        <p>Your AdMob Banner Ad will be displayed here</p>
+                    </div>
+                </div>
+                
+                <div class="ad-container">
+                    <div class="ad-label">Rewarded Ad</div>
+                    <div class="rewarded-ad">
+                        <h3>Rewarded Ad Space</h3>
+                        <p>Your AdMob Rewarded Ad will be displayed here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>V2BOX Web App © 2023 | Secure VPN Connection Manager</p>
+        </footer>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none;" accept=".ovpn,.conf,.txt">
+
+    <script>
+        // Connection status management
+        const statusText = document.getElementById('statusText');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const serverLocation = document.getElementById('serverLocation');
+        const serverPing = document.getElementById('serverPing');
+        const serverStatus = document.getElementById('serverStatus');
+        const serverProtocol = document.getElementById('serverProtocol');
+        const serverIP = document.getElementById('serverIP');
+        const bytesIn = document.getElementById('bytesIn');
+        const bytesOut = document.getElementById('bytesOut');
+        const configInput = document.getElementById('configInput');
+        const vpnIndicator = document.getElementById('vpnIndicator');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const currentTime = document.getElementById('currentTime');
+        const speedTestBtn = document.getElementById('speedTestBtn');
+        const speedResult = document.getElementById('speedResult');
+        const unloadedLatency = document.getElementById('unloadedLatency');
+        const loadedLatency = document.getElementById('loadedLatency');
+        const uploadSpeed = document.getElementById('uploadSpeed');
+        
+        let isConnected = false;
+        let bytesInValue = 0;
+        let bytesOutValue = 0;
+        let statsInterval;
+        let currentPing = 0;
+        let currentServer = {};
+        
+        // Format bytes to human readable format
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notificationText.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Parse configuration to extract server details
+        function parseConfig(configText) {
+            const server = {
+                ip: '1.46.201.64', // Default Thai IP
+                location: 'Thailand',
+                protocol: 'VLESS',
+                ping: Math.floor(Math.random() * 30 + 20)
+            };
+            
+            // Try to extract server details from configuration
+            if (configText.includes('@')) {
+                const matches = configText.match(/@([^:/\s]+)/);
+                if (matches && matches[1]) {
+                    server.ip = matches[1];
+                    
+                    // Try to determine location from IP or config
+                    if (server.ip.includes('thailand') || server.ip.includes('th')) {
+                        server.location = 'Thailand';
+                    } else if (server.ip.includes('japan') || server.ip.includes('jp')) {
+                        server.location = 'Japan';
+                    } else if (server.ip.includes('usa') || server.ip.includes('us')) {
+                        server.location = 'United States';
+                    } else if (server.ip.includes('netherlands') || server.ip.includes('nl')) {
+                        server.location = 'Netherlands';
+                    }
+                }
+            }
+            
+            // Determine protocol
+            if (configText.includes('vless://')) {
+                server.protocol = 'VLESS';
+            } else if (configText.includes('vmess://')) {
+                server.protocol = 'VMess';
+            } else if (configText.includes('trojan://')) {
+                server.protocol = 'Trojan';
+            } else if (configText.includes('openvpn')) {
+                server.protocol = 'OpenVPN';
+            }
+            
+            return server;
+        }
+        
+        // Update statistics
+        function updateStats() {
+            if (isConnected) {
+                bytesInValue += Math.floor(Math.random() * 100);
+                bytesOutValue += Math.floor(Math.random() * 50);
+                
+                bytesIn.textContent = formatBytes(bytesInValue);
+                bytesOut.textContent = formatBytes(bytesOutValue);
+            }
+        }
+        
+        // Connect function
+        function connectVPN() {
+            statusText.textContent = 'Connecting';
+            statusText.className = 'connecting';
+            connectBtn.disabled = true;
+            
+            showNotification('Connecting to VPN server...', 'connecting');
+            
+            // Parse configuration to get server details
+            currentServer = parseConfig(configInput.value);
+            
+            // Simulate connection delay
+            setTimeout(() => {
+                isConnected = true;
+                statusText.textContent = 'Connected';
+                statusText.className = 'connected';
+                disconnectBtn.disabled = false;
+                vpnIndicator.style.display = 'flex';
+                
+                // Set server information
+                serverLocation.textContent = currentServer.location;
+                serverPing.textContent = currentServer.ping + ' ms';
+                serverStatus.textContent = 'Active';
+                serverProtocol.textContent = currentServer.protocol;
+                serverIP.textContent = currentServer.ip;
+                
+                // Start updating stats
+                clearInterval(statsInterval);
+                statsInterval = setInterval(updateStats, 1000);
+                
+                // Update browser tab title with VPN indicator
+                document.title = '🔒 V2BOX VPN - Connected';
+                
+                // Show notification
+                showNotification('VPN connected to ' + currentServer.location, 'connected');
+                
+                // Request notification permission
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            }, 2000);
+        }
+        
+        // Disconnect function
+        function disconnectVPN() {
+            isConnected = false;
+            statusText.textContent = 'Disconnected';
+            statusText.className = 'disconnected';
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            vpnIndicator.style.display = 'none';
+            
+            // Reset server info
+            serverLocation.textContent = 'Not connected';
+            serverPing.textContent = 'N/A';
+            serverStatus.textContent = 'Inactive';
+            serverProtocol.textContent = 'None';
+            serverIP.textContent = '0.0.0.0';
+            
+            // Stop updating stats
+            clearInterval(statsInterval);
+            
+            // Reset browser tab title
+            document.title = 'V2BOX VPN Web Client';
+            
+            // Show notification
+            showNotification('VPN disconnected', 'disconnected');
+        }
+        
+        // Run speed test
+        function runSpeedTest() {
+            if (!isConnected) {
+                showNotification('Please connect to VPN first', 'disconnected');
+                return;
+            }
+            
+            speedTestBtn.disabled = true;
+            speedResult.textContent = 'Testing...';
+            unloadedLatency.textContent = '...';
+            loadedLatency.textContent = '...';
+            uploadSpeed.textContent = '...';
+            
+            // Simulate speed test
+            setTimeout(() => {
+                const downloadSpeed = (Math.random() * 50 + 30).toFixed(1);
+                const ulLatency = Math.floor(currentServer.ping * 0.8);
+                const lLatency = Math.floor(currentServer.ping * 1.3);
+                const upSpeed = (Math.random() * 30 + 20).toFixed(1);
+                
+                speedResult.textContent = downloadSpeed + ' Mbps';
+                unloadedLatency.textContent = ulLatency + ' ms';
+                loadedLatency.textContent = lLatency + ' ms';
+                uploadSpeed.textContent = upSpeed + ' Mbps';
+                
+                speedTestBtn.disabled = false;
+                
+                showNotification('Speed test completed', 'connected');
+            }, 3000);
+        }
+        
+        // Import from clipboard
+        function importFromClipboard() {
+            navigator.clipboard.readText()
+                .then(text => {
+                    configInput.value = text;
+                    showNotification('Configuration imported from clipboard', 'connected');
+                })
+                .catch(err => {
+                    showNotification('Failed to read from clipboard', 'disconnected');
+                });
+        }
+        
+        // Import from file
+        function importFromFile() {
+            document.getElementById('fileInput').click();
+        }
+        
+        // Handle file selection
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    configInput.value = e.target.result;
+                    showNotification('Configuration imported from file: ' + file.name, 'connected');
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        // Save configuration
+        function saveConfig() {
+            if (configInput.value.trim() === '') {
+                showNotification('Please enter a configuration first', 'disconnected');
+                return;
+            }
+            
+            const blob = new Blob([configInput.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'v2box_config.vpn';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Configuration saved successfully', 'connected');
+        }
+        
+        // Clear configuration
+        function clearConfig() {
+            configInput.value = '';
+        }
+        
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            currentTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Initialize
+        connectBtn.addEventListener('click', connectVPN);
+        disconnectBtn.addEventListener('click', disconnectVPN);
+        speedTestBtn.addEventListener('click', runSpeedTest);
+        
+        // Update time every minute
+        setInterval(updateTime, 60000);
+        updateTime();
+        
+        // Simulate ad loading
+        function loadAds() {
+            console.log('AdMob ads would be loaded here');
+        }
+        
+        // Initial ad load
+        loadAds();
+    </script>
+</body>
+</html>
